@@ -65,7 +65,12 @@ keyList = [ k for k in key_dict.keys() if key_dict[k] == collections.Counter(key
 
 try:
 	if len(uniqueValues) > 1:
-		sendMetric("redis.%s.status" % sys.argv[2], 0, now())
+		diff_list = [j-i for i, j in zip(key_dict.values()[:-1], key_dict.values()[1:])]
+		diff_keys = [i for i in diff_list if i > 5]
+		if not diff_keys:
+			sendMetric("redis.%s.status" % sys.argv[2], 1, now())
+		else:
+			sendMetric("redis.%s.status" % sys.argv[2], 0, now())
 	else:
 		sendMetric("redis.%s.status" % sys.argv[2], 1, now())
 except socket.error, exc:
